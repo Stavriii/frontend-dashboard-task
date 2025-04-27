@@ -1,39 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard Task</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <aside class="sidebar">
-      <nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
         <ul>
-          <li><a href="#">Dashboard</a></li>
-          <li><a href="#">Reports</a></li>
-          <li><a href="#">Settings</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Users</a></li>
+            <li><a href="#">Settings</a></li>
         </ul>
-      </nav>
-    </aside>
-
-    <main class="main-content">
-      <h1>User List</h1>
-      <input type="text" id="search" placeholder="Search users by name..." />
-      <ul id="user-list" class="user-list"></ul>
-    </main>
-  </div>
-
-  <!-- Modal for user posts -->
-  <div id="modal" class="modal hidden">
-    <div class="modal-content">
-      <span id="modal-close" class="modal-close">&times;</span>
-      <h2>User Posts</h2>
-      <div id="modal-body">Loading...</div>
     </div>
-  </div>
 
-  <script src="script.js"></script>
+    <!-- Main content -->
+    <div class="main-content">
+        <!-- User search input for live filtering -->
+        <input type="text" id="userSearch" placeholder="Search users by name" class="search-bar">
+        <div id="userList" class="user-list"></div>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="loading">Loading...</div>
+    </div>
+
+    <!-- Modal to display user posts -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <h2>User Posts</h2>
+            <ul id="postList"></ul>
+            <button id="closeModal">Close</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>

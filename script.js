@@ -1,80 +1,82 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const userList = document.getElementById('user-list');
-    const searchInput = document.getElementById('search');
-    const modal = document.getElementById('modal');
-    const modalBody = document.getElementById('modal-body');
-    const modalClose = document.getElementById('modal-close');
-  
-    let users = [];
-  
-    // Fetch users on load
+// Global variables for elements
+const userListElement = document.getElementById('userList');
+const userSearchElement = document.getElementById('userSearch');
+const loadingElement = document.getElementById('loading');
+const postModal = document.getElementById('postModal');
+const postListElement = document.getElementById('postList');
+const closeModalButton = document.getElementById('closeModal');
+
+// Fetch users from the API
+function fetchUsers() {
+    loadingElement.style.display = 'block'; // Show loading spinner
     fetch('https://jsonplaceholder.typicode.com/users')
-      .then(res => res.json())
-      .then(data => {
-        users = data;
-        renderUsers(users);
-      })
-      .catch(err => {
-        userList.innerHTML = `<li>Error loading users.</li>`;
-        console.error(err);
-      });
-  
-    // Render users
-    function renderUsers(users) {
-      userList.innerHTML = '';
-      users.forEach(user => {
-        const li = document.createElement('li');
-        li.textContent = `${user.name} (${user.email})`;
-        li.addEventListener('click', () => fetchUserPosts(user.id));
-        userList.appendChild(li);
-      });
-    }
-  
-    // Filter users
-    searchInput.addEventListener('input', () => {
-      const query = searchInput.value.toLowerCase();
-      const filtered = users.filter(user =>
-        user.name.toLowerCase().includes(query)
-      );
-      renderUsers(filtered);
-    });
-  
-    // Fetch user posts
-    function fetchUserPosts(userId) {
-      showModal();
-      modalBody.innerHTML = 'Loading...';
-  
-      fetch(`https://jsonplaceholder.typicode.com/posts?userId=${userId}`)
-        .then(res => res.json())
-        .then(posts => {
-          if (posts.length === 0) {
-            modalBody.innerHTML = '<p>No posts found.</p>';
-          } else {
-            modalBody.innerHTML = '<ul>' +
-              posts.map(post => `<li>${post.title}</li>`).join('') +
-              '</ul>';
-          }
+        .then(response => response.json())
+        .then(users => {
+            loadingElement.style.display = 'none'; // Hide loading spinner
+            displayUsers(users);
         })
-        .catch(err => {
-          modalBody.innerHTML = '<p>Error loading posts.</p>';
-          console.error(err);
+        .catch(error => {
+            loadingElement.style.display = 'none';
+            alert('Error fetching users: ' + error.message);
         });
-    }
-  
-    // Show/hide modal
-    function showModal() {
-      modal.classList.remove('hidden');
-    }
-  
-    modalClose.addEventListener('click', () => {
-      modal.classList.add('hidden');
+}
+
+// Display users in the UI
+function displayUsers(users) {
+    userListElement.innerHTML = ''; // Clear previous results
+    users.forEach(user => {
+        const userDiv = document.createElement('div');
+        userDiv.classList.add('user');
+        userDiv.innerHTML = `<strong>${user.name}</strong><br>${user.email}`;
+        userDiv.addEventListener('click', () => showUserPosts(user.id));
+        userListElement.appendChild(userDiv);
     });
-  
-    // Optional: Close modal on outside click
-    modal.addEventListener('click', e => {
-      if (e.target === modal) {
-        modal.classList.add('hidden');
-      }
+}
+
+// Show posts of a selected user in the modal
+function showUserPosts(userId) {
+    postModal.style.display = 'flex'; // Show the modal
+    postListElement.innerHTML = ''; // Clear previous posts
+
+    // Fetch the posts for the selected user
+    fetch(`https://jsonplaceholder.typicode.com/posts?userId=${userId}`)
+        .then(response => response.json())
+        .then(posts => {
+            // Loop through each post and display the title and body
+            posts.forEach(post => {
+                const postItem = document.createElement('li');
+                
+                // Display the title and body of the post
+                postItem.innerHTML = `
+                    <strong>${post.title}</strong>
+                    <p>${post.body}</p>
+                `;
+                postListElement.appendChild(postItem);
+            });
+        })
+        .catch(error => {
+            alert('Error fetching posts: ' + error.message);
+        });
+}
+
+// Close the modal when the close button is clicked
+closeModalButton.addEventListener('click', () => {
+    postModal.style.display = 'none';
+});
+
+// Filter users based on search input
+userSearchElement.addEventListener('input', function () {
+    const searchTerm = userSearchElement.value.toLowerCase();
+    const userItems = document.querySelectorAll('.user');
+    userItems.forEach(userItem => {
+        const userName = userItem.querySelector('strong').textContent.toLowerCase();
+        if (userName.includes(searchTerm)) {
+            userItem.style.display = 'block';
+        } else {
+            userItem.style.display = 'none';
+        }
     });
-  });
-  
+});
+
+// Initialize the app by fetching users when the page loads
+document.addEventListener('DOMContentLoaded', fetchUsers);
